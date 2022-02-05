@@ -690,7 +690,7 @@ class Figure
 					};
 				};
 			};
-			return MaybePositions;}else{return alert('Клетка пуста');};
+			return MaybePositions;}else{return false;;};
 		}; 
 		
 function WhatFigure(x,y,z,Pole){let answer;if (Pole[x][y][z]!=null){answer =Pole[x][y][z].Color+Pole[x][y][z].Name;}else{answer='Nothing'};return answer;};
@@ -727,6 +727,7 @@ let canvas = document.querySelector("canvas");
 		 context.fillRect(x_1,y_1,30,30);
 		}
 	 };
+	
   };
   function DrawPoleSixBySix_2(x,y)
   {
@@ -749,8 +750,9 @@ let canvas = document.querySelector("canvas");
 		{
 		 let x_1=x+30+60*i;let y_1=y+60*j;
 		 context.fillRect(x_1,y_1,30,30);
-		}
+		};
 	 };
+	
   };
   function DrawPole(x,y)
 	{
@@ -891,7 +893,7 @@ function DrawPoleNowMoment(Pole){
 	
 	let color;
 	let x_1=0;let y_1=0;
-    context.clearRect(0, 0, canvas.width, canvas.height);
+	context.clearRect(0, 0, canvas.width, canvas.height);
 	DrawPole(con_x,con_y);
 for (let x=0;x<6;x++){for(let y=0;y<6;y++){for(let z=0;z<8;z++)
 	{
@@ -911,7 +913,7 @@ for (let x=0;x<6;x++){for(let y=0;y<6;y++){for(let z=0;z<8;z++)
 function DrawGreenSquare(x_1,y_1)
 	{
 	 context.beginPath();
-	 context.strokeStyle ="rgba(255,165,0,1)";
+	 context.strokeStyle ='green';
 	 context.lineWidth=3;
 	 
      context.strokeRect(x_1+2,y_1+2,25,25);	 
@@ -926,16 +928,19 @@ function DrawMaybeMoves(x,y,z)
 	    let x_1=0;let y_1=0;	
 		let x_2;let y_2;let z_2;
 		let arrr=MaybeMoves(x,y,z,Pole);
+		if(!(arrr)){return;};
 		for(let i=0;i<arrr.length;i++)
 		{
+			context.beginPath();
 			x_2=arrr[i][0];y_2=arrr[i][1];z_2=arrr[i][2];
 			x_1=PoleDraw[x_2][y_2][z_2][0];y_1=PoleDraw[x_2][y_2][z_2][1];
-			context.strokeStill="Green";
-			context.lineWidth=3;
+			context.strokeStill='green';
+			context.lineWidth=2;
 			
 			context.strokeRect(x_1+2,y_1+2,25,25);	 
+			context.stroke();
 		};
-		 context.closePath();
+		
 	};	
 	
 ////////////////////////////////////////////////////////////////////
@@ -1072,6 +1077,7 @@ function CheckMate(x,y,z,Pole,COLOR)
 	
 let elem1 = document.querySelector('#elem1');
 let elem2 = document.querySelector('#elem2');
+let History = document.querySelector('#History');
 function FoundKing(Pole)
     {
 		let result=[false,false];
@@ -1088,12 +1094,12 @@ function FoundKing(Pole)
 							if(Pole[x][y][z].Color=='White')
 							{
 								if((InMaybeMoves(x,y,z,Pole))&&(CheckMate(x,y,z,Pole))){elem1.value = 'CheckMateWhite';}
-								else if((InMaybeMoves(x,y,z,Pole))&&(!(CheckMate(x,y,z,Pole)))){elem1.value = 'CheckWhite';}else{elem1.value = 'NotCheck'};
+								else if((InMaybeMoves(x,y,z,Pole))&&(!(CheckMate(x,y,z,Pole)))){elem1.value = 'CheckWhite';return;}else{elem1.value = 'NotCheck'};
 							};
 							if(Pole[x][y][z].Color=='Black')
 							{
 								if((InMaybeMoves(x,y,z,Pole))&&(CheckMate(x,y,z,Pole))){elem1.value = 'CheckMateBlack';}
-								else if((InMaybeMoves(x,y,z,Pole))&&(!(CheckMate(x,y,z,Pole)))){elem1.value = 'CheckBlack';}else{elem1.value = 'NotCheck'};								
+								else if((InMaybeMoves(x,y,z,Pole))&&(!(CheckMate(x,y,z,Pole)))){elem1.value = 'CheckBlack';return;}else{elem1.value = 'NotCheck'};								
 							};
 						};
 					};
@@ -1103,54 +1109,117 @@ function FoundKing(Pole)
 		
 	};		
 	
-
+function sum(a, b) {
+  return a + b;
+};
 function Move(x,y,z,x_1,y_1,z_1,Pole,ColorMove)
 	{ 
 		if(ColorMove&&(Pole[x][y][z].Color=='White'))
 		{
 			Pole[x_1][y_1][z_1]=Pole[x][y][z];
-			Pole[x][y][z]=null; elem2.value = 'MoveBlack';
-			return Pole;
+			Pole[x][y][z]=null; elem2.value = 'MoveBlack';FoundKing(Pole);
+			History.value=History.value + Pole[x_1][y_1][z_1].Name;
+			History.value=History.value + Pole[x_1][y_1][z_1].Color;
+			History.value=History.value +'(' + sum(x,1)+',' ;
+			History.value=History.value + sum(y,1)+','+sum(z,1)+')'+'->' + '(' + sum(x_1,1) + ',' + sum(y_1,1) + ',' + sum(z_1,1) + ')'+':';
+			return true;
 		}
 		else if(!(ColorMove)&&(Pole[x][y][z].Color=='Black'))
 		{
 			Pole[x_1][y_1][z_1]=Pole[x][y][z];
-			Pole[x][y][z]=null; elem2.value = 'MoveWhite';
-			return Pole;
-		};
+			Pole[x][y][z]=null; elem2.value = 'MoveWhite';FoundKing(Pole);
+			History.value=History.value + Pole[x_1][y_1][z_1].Name;
+			History.value=History.value + Pole[x_1][y_1][z_1].Color;
+			History.value=History.value + '(' + sum(x,1) + ',' ;
+			History.value=History.value + sum(y,1)+','+sum(z,1)+')'+'->'+'('+sum(x_1,1)+','+sum(y_1,1)+','+sum(z_1,1)+')'+';'+'\n';
+			return true;
+		}else{return false};
 		
 	};
 
-
-
+function SearchPosition(string)
+{
+	let result=[];str=string;
+	let i=0;let StartNumber=[];let FinishNumber=[];let k=0;Numbers=[];
+	while(i<str.length)
+	{
+		if(string.charAt(i)=='('){StartNumber[k]=i;}
+		if(string.charAt(i)==')'){FinishNumber[k]=i;str=string.slice(StartNumber[k]+1,FinishNumber[k])};
+		i++;
+	};
+	result[0]=Number(str[0])-1;
+	result[1]=Number(str[2])-1;
+	result[2]=Number(str[4])-1;
+	
+	result[3]=string.slice(FinishNumber[k]+2);
+	return result;
+};
 
 let Before2=false;
 let Before=true;
 let startMove=null;
-DrawPoleNowMoment(Pole);
+let OnBut=false;
 function PositionClick(x_mouse,y_mouse)
 	{ 
 	    let ClickPosition;
 		for (let x=0;x<6;x++){for(let y=0;y<6;y++){for(let z=0;z<8;z++)
 		{
 			let g=PoleDraw[x][y][z][0];let h=PoleDraw[x][y][z][1];
-			if(((g<x_mouse)&&(g+30>x_mouse))&&((h<y_mouse)&&(h+30>y_mouse))){ ClickPosition=[x,y,z];};
+			if(((g+7<x_mouse)&&(g+38>x_mouse))&&((h+6<y_mouse)&&(h+38>y_mouse))){ ClickPosition=[x,y,z];};
 		};};};
 		return ClickPosition;
 	};		
 let ColorMove;
+//////////////////////////////////////////////////////
 
 
 
 
+let string=[];
+DrawPoleNowMoment(Pole);
+function ReadFile(input) 
+{
+	let file = input.files[0];
+	let Numbers;
+	let reader = new FileReader();
+	let sum=0;
+	reader.readAsText(file);
+	let MoveOrNot=true;
+	let finishMove=null;
+	reader.onload = function()
+	{
+		string=reader.result;
+		while(MoveOrNot)
+		{
+			finishMove=null;
+			startMove=null;
+			startMove=SearchPosition(string);
+			string=startMove[3];
+			finishMove=SearchPosition(string);
+			string=finishMove[3];
+			if(elem2.value == 'MoveWhite'){ColorMove=true;}else if(elem2.value == 'MoveBlack'){ColorMove=false;};
+			MoveOrNot=Move(startMove[0],startMove[1],startMove[2],finishMove[0],finishMove[1],finishMove[2],Pole,ColorMove);	
+			DrawPoleNowMoment(Pole);
+		};
+		DrawPoleNowMoment(Pole);
+		return Pole;
+	};
 
+	reader.onerror = function()
+	{
+		console.log(reader.error);
+	};
+	
+};
 
 document.addEventListener("mousedown", function(e)
 {	
+	x_mouse=e.pageX; y_mouse=e.pageY;
 	if(elem2.value == 'MoveWhite'){ColorMove=true;}else if(elem2.value == 'MoveBlack'){ColorMove=false;};
-	FoundKing(Pole);
+	if((x_mouse<951)&&(y_mouse<601)){
 	if(Before2)
 	{
+		if((x_mouse<951)&&(y_mouse<601)){
 		let finishMove=null;
 		let did=0;
 		Before2=false;
@@ -1161,22 +1230,23 @@ document.addEventListener("mousedown", function(e)
 		for(let i=0;i<arrayMM.length;i++){
 		if((arrayMM[i][0]==finishMove[0])&&(arrayMM[i][1]==finishMove[1])&&(arrayMM[i][2]==finishMove[2])){
 		Move(startMove[0],startMove[1],startMove[2],finishMove[0],finishMove[1],finishMove[2],Pole,ColorMove);
-		DrawPoleNowMoment(Pole);}else{did++;};
+		}else{did++;};
 		};
-		if(did==arrayMM.length){DrawPoleNowMoment(Pole); alert('Impossible move!');};
-		
+		if(did==arrayMM.length){};DrawPoleNowMoment(Pole);
+		};
 		
 	}
 	else if(Before)
-	{
+	{ 
+		
 		Before=false;
 		Before2=true;
-		x_mouse=e.pageX; y_mouse=e.pageY;
 		startMove=PositionClick(x_mouse,y_mouse);
-		 context.clearRect(0, 0, canvas.width, canvas.height);
-		 DrawPoleNowMoment(Pole);
 		DrawMaybeMoves(startMove[0],startMove[1],startMove[2]);
+
 	};
-	
+	};
 });	
+
+
 
